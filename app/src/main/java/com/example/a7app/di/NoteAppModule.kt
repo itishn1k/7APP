@@ -20,7 +20,7 @@ object NoteAppModule {
     @Singleton
     @Provides
     fun provideNoteDataBase(@ApplicationContext context: Context) =
-        Room.databaseBuilder(context, NoteDataBase::class.java, "note_db")
+        Room.databaseBuilder(context, NoteDataBase::class.java, "note_db").allowMainThreadQueries().build()
 
     @Provides
     fun provideNoteDao(noteDataBase: NoteDataBase) = noteDataBase.noteDao()

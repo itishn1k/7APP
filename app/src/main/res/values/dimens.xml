@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="ts_36">36sp</dimen>
+    <dimen name="ts_24">24sp</dimen>
+    <dimen name="tv_margin_8">8dp</dimen>
+    <dimen name="vp_8">8dp</dimen>
+    <dimen name="hp_16">16dp</dimen>
+    <dimen name="btn_margin_16">16dp</dimen>
+</resources>
