@@ -8,6 +8,7 @@ import com.example.a7app.domain.model.Note
 import com.example.a7app.domain.repository.NoteRepository
 import com.example.a7app.domain.utils.Resource
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
@@ -16,6 +17,11 @@ import java.io.IOException
 class NoteRepositoryImpl @Inject constructor(
     private val noteDao: NoteDao
 ) : NoteRepository, BaseRepository() {
+
+    override fun getAllNotes() = doRequest {
+        noteDao.getAllNotes().map { it.toNote() }
+    }
+
     override fun createNote(note: Note) = doRequest {
         noteDao.createNote(note.toNoteEntity())
     }
@@ -26,9 +32,5 @@ class NoteRepositoryImpl @Inject constructor(
 
     override fun deleteNote(note: Note) = doRequest {
         noteDao.deleteNote(note.toNoteEntity())
-    }
-
-    override fun getAllNotes() = doRequest {
-        noteDao.getAllNotes().map { it.toNote() }
     }
 }

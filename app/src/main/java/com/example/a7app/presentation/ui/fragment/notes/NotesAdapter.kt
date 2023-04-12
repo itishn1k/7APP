@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModel
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.a7app.databinding.ItemNotesBinding
 import com.example.a7app.domain.model.Note
@@ -11,11 +13,11 @@ import com.example.a7app.domain.model.Note
 class NotesAdapter(
     private val onLongClick: (Note) -> Unit,
     private val onClick: (Note) -> Unit
-) : RecyclerView.Adapter<NotesAdapter.NotesViewHolder>() {
+) : ListAdapter<Note, NotesAdapter.NotesViewHolder>(DiffUtilItemCallback()) {
 
-    private var notesList = arrayListOf<Note>()
 
-    inner class NotesViewHolder(private val binding: ItemNotesBinding) :
+    inner class NotesViewHolder(
+        private val binding: ItemNotesBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(note: Note) {
             binding.tvTitle.text = note.title
@@ -25,32 +27,34 @@ class NotesAdapter(
             }
             itemView.setOnLongClickListener {
                 onLongClick(note)
-                false
+                true
             }
         }
-    }
-
-    @SuppressLint("NotifyDataSetChanged")
-    fun addNotes(newData: List<Note>) {
-        notesList.clear()
-        notesList.addAll(newData)
-        notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NotesViewHolder {
         return NotesViewHolder(
             ItemNotesBinding.inflate(
-                LayoutInflater.from(parent.context),
+                LayoutInflater.from(
+                    parent.context
+                ),
                 parent, false
             )
         )
     }
 
     override fun onBindViewHolder(holder: NotesAdapter.NotesViewHolder, position: Int) {
-        holder.bind(notesList[position])
+        holder.bind(getItem(position))
     }
 
-    override fun getItemCount(): Int {
-        return notesList.size
+    @SuppressLint("DiffUtilEquals")
+    private class DiffUtilItemCallback : DiffUtil.ItemCallback<Note>() {
+        override fun areItemsTheSame(oldItem: Note, newItem: Note): Boolean {
+            return oldItem.id == newItem.id
+        }
+
+        override fun areContentsTheSame(oldItem: Note, newItem: Note): Boolean {
+            return oldItem == newItem
+        }
     }
 }

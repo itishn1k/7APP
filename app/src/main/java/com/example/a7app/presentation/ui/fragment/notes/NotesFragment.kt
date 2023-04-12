@@ -1,122 +1,85 @@
 package com.example.a7app.presentation.ui.fragment.notes
 
 import android.app.AlertDialog
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.Toast
-import androidx.fragment.app.Fragment
+import androidx.core.os.bundleOf
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.example.a7app.R
 import com.example.a7app.databinding.FragmentNotesBinding
 import com.example.a7app.domain.model.Note
+import com.example.a7app.domain.utils.Resource
+import com.example.a7app.presentation.ui.base.BaseFragment
+import com.example.a7app.presentation.utils.Constants.KEY_EDIT_NOTE
 import com.example.a7app.presentation.utils.UIState
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class NotesFragment : Fragment() {
+class NotesFragment :
+    BaseFragment<FragmentNotesBinding, NotesViewModel>(R.layout.fragment_notes) {
 
-    private val viewModel by viewModels<NotesViewModel>()
-    private var _binding: FragmentNotesBinding? = null
-    private lateinit var adapter: NotesAdapter
-    private val binding get() = _binding!!
-    private lateinit var notesList : List<Note>
+    override val viewModel by viewModels<NotesViewModel>()
+    override val binding by viewBinding(FragmentNotesBinding::bind)
+    private val notesAdapter by lazy { NotesAdapter(this::onLongClick, this::onClick) }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        adapter = NotesAdapter(this::onLongClick, this::onClick)
+    override fun init() {
+        binding.rvNotes.adapter = notesAdapter
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentNotesBinding.inflate(inflater, container, false)
-        return binding.root
+    override fun setRequests() {
+        getAllNotesRequest()
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        init()
-        setRequests()
-        setSubscribers()
-        initListeners()
-    }
-
-    private fun init() {
-    }
-
-    private fun initListeners() {
-        binding.fab.setOnClickListener {
-            findNavController().navigate(R.id.addEditNoteFragment)
-        }
-    }
-
-    private fun setSubscribers() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.getAllNotesState.collect {
-                    when (it) {
-                        is UIState.Empty -> {}
-                        is UIState.Error -> {
-                            Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
-                        }
-                        is UIState.Loading -> {
-                            //TODO(ShowProgressBar)
-                        }
-                        is UIState.Success -> {
-                            adapter.addNotes(it.data)
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private fun setRequests() {
+    private fun getAllNotesRequest() {
         viewModel.getAllNotes()
     }
 
+    override fun setSubscribers() {
+        viewModel.getAllNotesState.collectUIState(
+            uiState = {
+                binding.progressBar.isVisible = it is UIState.Loading
+            },
+            onSuccess = {
+                notesAdapter.submitList(it)
+            }
+        )
+        viewModel.deleteNoteState.collectUIState(
+            uiState = {
+                binding.progressBar.isVisible = it is UIState.Loading
+            },
+            onSuccess = {
+                getAllNotesRequest()
+            }
+        )
+    }
+
+    override fun initListeners() {
+        binding.fab.setOnClickListener {
+            findNavController().navigate(R.id.createEditNoteFragment)
+        }
+    }
+
     private fun onLongClick(note: Note) {
-//        val builder = AlertDialog.Builder(requireContext())
-//        if (requireContext().isNetworkConnected()) { //homework7
-//            builder.setTitle("Sorry")
-//            builder.setMessage("Deleting unavailable now")
-//            builder.show()
-//        } else {
-//            builder.setTitle("Delete")
-//            builder.setMessage("Are you sure you want to delete this note?")
-//
-//
-//            builder.setPositiveButton("Yes") { _: DialogInterface, _: Int ->
-//                App.db.dao().delete(task)
-//                setData()
-//            }
-//
-//            builder.setNegativeButton("No") { _: DialogInterface, _: Int ->
-//            }
-//            builder.show()
-//        }
+        val builder = AlertDialog.Builder(requireContext())
+        with(builder) {
+            setTitle(getString(R.string.delete_note))
+            setPositiveButton(getString(R.string.yes_)) { _, _ ->
+                viewModel.deleteNote(note)
+                Toast.makeText(
+                    requireContext(), getString(R.string.note_deleted), Toast.LENGTH_SHORT
+                ).show()
+            }
+            setNegativeButton(getString(R.string.no)) { n, _ ->
+                n.cancel()
+            }
+        }.show()
     }
 
     private fun onClick(note: Note) {
-//        if (requireContext().isNetworkConnected()) {//homework7
-//            showToast("Editing unavailable now")
-//        } else {
-//            findNavController().navigate(R.id.navigation_task, bundleOf(KEY_FOR_TASK to task))
-//        }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+        findNavController().navigate(
+            R.id.createEditNoteFragment, bundleOf(KEY_EDIT_NOTE to note)
+        )
     }
 }

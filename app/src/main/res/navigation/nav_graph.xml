@@ -11,8 +11,8 @@
         android:label="fragment_notes"
         tools:layout="@layout/fragment_notes" />
     <fragment
-        android:id="@+id/addEditNoteFragment"
-        android:name="com.example.a7app.presentation.ui.fragment.addeditnote.AddEditNoteFragment"
-        android:label="fragment_edit_note"
-        tools:layout="@layout/fragment_add_edit_note" />
+        android:id="@+id/createEditNoteFragment"
+        android:name="com.example.a7app.presentation.ui.fragment.createeditnote.CreateEditNoteFragment"
+        android:label="fragment_create_edit_note"
+        tools:layout="@layout/fragment_create_edit_note" />
 </navigation>
