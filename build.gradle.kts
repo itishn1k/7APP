@@ -4,5 +4,5 @@ plugins {
     id(Plugins.AGP.library) version Versions.AGP apply false
     id(Plugins.KotlinAndroid.kotlin) version Versions.kotlin apply false
     id(Plugins.DaggerHilt.hilt) version Versions.hilt apply false
-    id(Plugins.KotlinAndroid.jvm) version Versions.kotlin apply false
+    //id(Plugins.KotlinAndroid.jvm) version Versions.kotlin apply false
 }

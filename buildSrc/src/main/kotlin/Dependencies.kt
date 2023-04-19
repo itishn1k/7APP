@@ -47,9 +47,9 @@ object Dependencies {
         const val viewModelktx = "androidx.lifecycle:lifecycle-viewmodel-ktx:${Versions.lifecycle}"
         const val runtimektx = "androidx.lifecycle:lifecycle-runtime-ktx:${Versions.lifecycle}"
     }
-    object JavaX {
-        const val inject = "javax.inject:javax.inject:1"
-    }
+//    object JavaX {
+//        const val inject = "javax.inject:javax.inject:1"
+//    }
 }
 
 object Versions {
@@ -80,13 +80,13 @@ object Plugins {
     object KotlinAndroid {
         const val kotlin = "org.jetbrains.kotlin.android"
         const val kapt = "kotlin-kapt"
-        const val jvm = "org.jetbrains.kotlin.jvm"
+   //     const val jvm = "org.jetbrains.kotlin.jvm"
     }
 
     object DaggerHilt {
         const val hilt = "com.google.dagger.hilt.android"
     }
-    object Java {
-        const val library = "java-library"
-    }
+//    object Java {
+//        const val library = "java-library"
+//    }
 }
